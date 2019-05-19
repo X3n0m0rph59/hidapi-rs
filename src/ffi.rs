@@ -23,6 +23,8 @@ pub struct HidDeviceInfo {
     pub next: *mut HidDeviceInfo,
 }
 
+unsafe impl Send for HidDeviceInfo {}
+
 #[allow(dead_code)]
 extern "C" {
     pub fn hid_init() -> c_int;

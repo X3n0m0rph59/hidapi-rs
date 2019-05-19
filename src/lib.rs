@@ -48,10 +48,10 @@ use libc::{c_int, size_t, wchar_t};
 use std::ffi::CStr;
 use std::ffi::CString;
 use std::mem::ManuallyDrop;
+use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 pub use error::HidError;
-use std::sync::Arc;
 
 pub type HidResult<T> = Result<T, HidError>;
 
@@ -251,6 +251,8 @@ pub struct HidDeviceInfo {
     pub usage: u16,
     pub interface_number: i32,
 }
+
+unsafe impl Send for HidDevice {}
 
 impl HidDeviceInfo {
     /// Use the information contained in `HidDeviceInfo` to open

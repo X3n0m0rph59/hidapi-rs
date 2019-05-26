@@ -237,8 +237,8 @@ unsafe fn conv_hid_device_info(src: *mut ffi::HidDeviceInfo) -> HidResult<HidDev
     })
 }
 
-#[derive(Debug, Clone)]
 /// Storage for device related information
+#[derive(Debug, Clone)]
 pub struct HidDeviceInfo {
     pub path: CString,
     pub vendor_id: u16,
@@ -252,7 +252,6 @@ pub struct HidDeviceInfo {
     pub interface_number: i32,
 }
 
-unsafe impl Send for HidDevice {}
 
 impl HidDeviceInfo {
     /// Use the information contained in `HidDeviceInfo` to open
@@ -278,20 +277,23 @@ impl HidDeviceInfo {
 }
 
 /// Object for accessing HID device
+#[derive(Clone)]
 pub struct HidDevice {
     _hid_device: *mut ffi::HidDevice,
     /// Prevents this from outliving the api instance that created it
     _lock: ManuallyDrop<Arc<HidApiLock>>,
 }
 
-impl Drop for HidDevice {
-    fn drop(&mut self) {
-        unsafe {
-            ffi::hid_close(self._hid_device);
-            ManuallyDrop::drop(&mut self._lock);
-        };
-    }
-}
+unsafe impl Send for HidDevice {}
+
+// impl Drop for HidDevice {
+//     fn drop(&mut self) {
+//         unsafe {
+//             ffi::hid_close(self._hid_device);
+//             ManuallyDrop::drop(&mut self._lock);
+//         };
+//     }
+// }
 
 impl HidDevice {
     /// Check size returned by other methods, if it's equal to -1 check for
@@ -484,5 +486,14 @@ impl HidDevice {
         };
         let res = self.check_size(res)?;
         unsafe { wchar_to_string(buf[..res].as_ptr()) }
+    }
+
+    pub fn close(&mut self) -> HidResult<()> {
+        unsafe {
+            ffi::hid_close(self._hid_device);
+            ManuallyDrop::drop(&mut self._lock);
+        };
+
+        Ok(())
     }
 }

@@ -40,14 +40,14 @@ fn compile_linux() {
     // First check the features enabled for the crate.
     // Only one linux backend should be enabled at a time.
 
-    let avail_backends: [(&'static str, Box<Fn()>); 4] = [
+    let avail_backends: [(&'static str, Box<dyn Fn()>); 4] = [
         (
             "LINUX_STATIC_HIDRAW",
             Box::new(|| {
                 let mut config = cc::Build::new();
                 config
-                    .file("etc/hidapi/linux/hid.c")
-                    .include("etc/hidapi/hidapi");
+                    .file("etc/libusb-hidapi/linux/hid.c")
+                    .include("etc/libusb-hidapi/hidapi");
                 pkg_config::probe_library("libudev").expect("Unable to find libudev");
                 config.compile("libhidapi.a");
             }),
@@ -57,8 +57,8 @@ fn compile_linux() {
             Box::new(|| {
                 let mut config = cc::Build::new();
                 config
-                    .file("etc/hidapi/libusb/hid.c")
-                    .include("etc/hidapi/hidapi");
+                    .file("etc/libusb-hidapi/libusb/hid.c")
+                    .include("etc/libusb-hidapi/hidapi");
                 let lib =
                     pkg_config::find_library("libusb-1.0").expect("Unable to find libusb-1.0");
                 for path in lib.include_paths {
@@ -108,16 +108,16 @@ fn compile_linux() {
 
 fn compile_windows() {
     cc::Build::new()
-        .file("etc/hidapi/windows/hid.c")
-        .include("etc/hidapi/hidapi")
+        .file("etc/libusb-hidapi/windows/hid.c")
+        .include("etc/libusb-hidapi/hidapi")
         .compile("libhidapi.a");
     println!("cargo:rustc-link-lib=setupapi");
 }
 
 fn compile_macos() {
     cc::Build::new()
-        .file("etc/hidapi/mac/hid.c")
-        .include("etc/hidapi/hidapi")
+        .file("etc/libusb-hidapi/mac/hid.c")
+        .include("etc/libusb-hidapi/hidapi")
         .compile("libhidapi.a");
     println!("cargo:rustc-link-lib=framework=IOKit");
     println!("cargo:rustc-link-lib=framework=CoreFoundation");

@@ -1,3 +1,3 @@
-[submodule "etc/hidapi"]
-	path = etc/hidapi
-	url = https://github.com/signal11/hidapi.git
+[submodule "etc/libusb-hidapi"]
+	path = etc/libusb-hidapi
+	url = https://github.com/libusb/hidapi.git
